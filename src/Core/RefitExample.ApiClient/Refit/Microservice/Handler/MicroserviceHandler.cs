@@ -4,6 +4,7 @@ using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication
 using RefitExample.Arguments.Argument.Session;
 using RefitExample.Arguments.Enum.Microservice;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
@@ -48,8 +49,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
     {
         if (!string.IsNullOrEmpty(token))
         {
-            request.Headers.Remove(AuthorizationHeader);
-            request.Headers.Add(AuthorizationHeader, $"Bearer {token}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 
