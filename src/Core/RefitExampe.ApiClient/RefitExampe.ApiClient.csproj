@@ -10,4 +10,12 @@
     <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RefitExample.Arguments\RefitExample.Arguments.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Service\Microservice\User\" />
+  </ItemGroup>
+
 </Project>

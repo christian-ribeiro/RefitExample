@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Arguments", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Api", "Core\RefitExample.Api\RefitExample.Api.csproj", "{4D9F802F-B431-4510-908B-6A627BDE8DD8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Domain", "Core\RefitExample.Domain\RefitExample.Domain.csproj", "{D5BC3BF4-C3FE-4FDC-B5C7-891C688D8FC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4D9F802F-B431-4510-908B-6A627BDE8DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D9F802F-B431-4510-908B-6A627BDE8DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D9F802F-B431-4510-908B-6A627BDE8DD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5BC3BF4-C3FE-4FDC-B5C7-891C688D8FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5BC3BF4-C3FE-4FDC-B5C7-891C688D8FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5BC3BF4-C3FE-4FDC-B5C7-891C688D8FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BC3BF4-C3FE-4FDC-B5C7-891C688D8FC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
