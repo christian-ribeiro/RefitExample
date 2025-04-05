@@ -22,13 +22,13 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
     private async Task<HttpResponseMessage> SendWithAuthRetryAsync(HttpRequestMessage request, bool isRetry, CancellationToken cancellationToken)
     {
         var guidSessionDataRequest = GetGuidSessionDataRequest();
-        long loggedUserId = SessionData.GetLoggedUser(guidSessionDataRequest) ?? 0;
+        long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
         EnumMicroservice microservice = GetMicroservice(request);
 
-        var authentication = SessionData.GetMicroserviceAuthentication(microservice, loggedUserId);
+        var authentication = SessionData.GetMicroserviceAuthentication(microservice, loggedEnterpriseId);
         if (authentication == null && !isRetry)
         {
-            await Authenticate(loggedUserId, microservice);
+            await Authenticate(loggedEnterpriseId, microservice);
             return await SendWithAuthRetryAsync(request, true, cancellationToken);
         }
 
@@ -38,7 +38,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
         if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !isRetry)
         {
-            await Authenticate(loggedUserId, microservice);
+            await Authenticate(loggedEnterpriseId, microservice);
             return await SendWithAuthRetryAsync(request, true, cancellationToken);
         }
 
@@ -53,13 +53,13 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
         }
     }
 
-    private async Task Authenticate(long loggedUserId, EnumMicroservice microservice)
+    private async Task Authenticate(long loggedEntepriseId, EnumMicroservice microservice)
     {
-        if (loggedUserId == 0)
+        if (loggedEntepriseId == 0)
             return;
 
         var authenticate = await authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedUserId, authenticate.Token));
+        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedEntepriseId, authenticate.Token));
     }
 
     private Guid GetGuidSessionDataRequest()

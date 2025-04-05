@@ -13,7 +13,7 @@ public class UserController(IUserService userService) : Controller
     public async Task<ActionResult> GetUsers(int page = 1)
     {
         Guid _guidSessionDataRequest = SessionData.Initialize();
-        SessionData.SetLoggedUser(_guidSessionDataRequest, 1);
+        SessionData.SetLoggedEnterprise(_guidSessionDataRequest, 1);
 
         Request.Headers.Append(MicroserviceHandler.GuidSessionDataRequest, _guidSessionDataRequest.ToString());
 

@@ -21,10 +21,10 @@ namespace RefitExample.Arguments.Argument.Session
             ListMicroserviceAuthentication.Add(microserviceAuthentication);
         }
 
-        public static void SetLoggedUser(Guid guidSessionDataRequest, long loggedUserId)
+        public static void SetLoggedEnterprise(Guid guidSessionDataRequest, long enterpriseId)
         {
             if (_listSessionDataRequest.TryGetValue(guidSessionDataRequest, out var sessionData))
-                sessionData.LoggerUserId = loggedUserId;
+                sessionData.EnterpriseId = enterpriseId;
         }
 
         public static MicroserviceAuthentication? GetMicroserviceAuthentication(EnumMicroservice microservice, long enterpriseId)
@@ -32,9 +32,9 @@ namespace RefitExample.Arguments.Argument.Session
             return ListMicroserviceAuthentication.Where(x => x.Microservice == microservice && x.EntepriseId == enterpriseId).FirstOrDefault();
         }
 
-        public static long? GetLoggedUser(Guid guidSessionDataRequest)
+        public static long? GetLoggedEnterprise(Guid guidSessionDataRequest)
         {
-            return _listSessionDataRequest.TryGetValue(guidSessionDataRequest, out var sessionData) ? sessionData.LoggerUserId : null;
+            return _listSessionDataRequest.TryGetValue(guidSessionDataRequest, out var sessionData) ? sessionData.EnterpriseId : null;
         }
     }
 }
