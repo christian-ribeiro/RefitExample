@@ -15,8 +15,4 @@
     <ProjectReference Include="..\RefitExample.Arguments\RefitExample.Arguments.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Service\Microservice\User\" />
-  </ItemGroup>
-
 </Project>
