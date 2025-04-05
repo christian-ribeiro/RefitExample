@@ -18,11 +18,12 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
     {
         var guidSessionDataRequest = GetGuidSessionDataRequest();
         long loggedUserId = SessionData.GetLoggedUser(guidSessionDataRequest) ?? 0;
+        EnumMicroservice microservice = GetMicroservice(request);
 
-        var authentication = SessionData.GetMicroserviceAuthentication(EnumMicroservice.DrugTrafficking, loggedUserId);
+        var authentication = SessionData.GetMicroserviceAuthentication(microservice, loggedUserId);
         if (authentication == null && !exit)
         {
-            Authenticate(loggedUserId);
+            Authenticate(loggedUserId, microservice);
             return await TrySendAsync(request, cancellationToken, true);
         }
 
@@ -35,20 +36,20 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
         if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !exit)
         {
-            Authenticate(loggedUserId);
+            Authenticate(loggedUserId, microservice);
             return await TrySendAsync(request, cancellationToken, true);
         }
 
         return response;
     }
 
-    private void Authenticate(long loggedUserId)
+    private void Authenticate(long loggedUserId, EnumMicroservice microservice)
     {
         if (loggedUserId == 0)
             return;
 
         var authenticate = authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(EnumMicroservice.DrugTrafficking, loggedUserId, authenticate.Result.Token));
+        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedUserId, authenticate.Result.Token));
     }
 
     private Guid GetGuidSessionDataRequest()
@@ -59,5 +60,15 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
         }
 
         return Guid.Empty;
+    }
+
+    private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
+    {
+        if (request.Headers.TryGetValues("X-Refit-Client", out var values) && Enum.TryParse<EnumMicroservice>(values.FirstOrDefault(), out var enumValue))
+        {
+            return enumValue;
+        }
+
+        return EnumMicroservice.None;
     }
 }
