@@ -1,5 +1,5 @@
-﻿using RefitExampe.ApiClient.Refit.Microservice.Endpoint.Customer;
-using RefitExampe.ApiClient.Refit.Microservice.Endpoint.User;
+﻿using RefitExample.ApiClient.Refit.Microservice.Endpoint.Customer;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.User;
 using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
 using RefitExample.Domain.Interface.Service.User;
 

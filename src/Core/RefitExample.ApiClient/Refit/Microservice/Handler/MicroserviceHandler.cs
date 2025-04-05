@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RefitExampe.ApiClient.Interface.Service.Microservice.Authentication;
+using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
 using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
 using RefitExample.Arguments.Argument.Session;
 using RefitExample.Arguments.Enum.Microservice;
 using System.Net;
 
-namespace RefitExampe.ApiClient.Refit.Microservice.Handler;
+namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
 public class MicroserviceHandler(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
+    public const string AuthorizationHeader = "Authorization";
+    public const string GuidSessionDataRequest = "GuidSessionDataRequest";
+    public const string RefitClientHeader = "X-Refit-Client";
+
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         return await SendWithAuthRetryAsync(request, false, cancellationToken);
@@ -27,11 +31,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
             return await SendWithAuthRetryAsync(request, true, cancellationToken);
         }
 
-        if (authentication != null)
-        {
-            request.Headers.Remove("Authorization");
-            request.Headers.Add("Authorization", $"Bearer {authentication!.Token}");
-        }
+        UpdateAuthorizationHeader(request, authentication?.Token);
 
         var response = await base.SendAsync(request, cancellationToken);
 
@@ -42,6 +42,15 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
         }
 
         return response;
+    }
+
+    private static void UpdateAuthorizationHeader(HttpRequestMessage request, string? token)
+    {
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.Headers.Remove(AuthorizationHeader);
+            request.Headers.Add(AuthorizationHeader, $"Bearer {token}");
+        }
     }
 
     private async Task Authenticate(long loggedUserId, EnumMicroservice microservice)
@@ -55,7 +64,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     private Guid GetGuidSessionDataRequest()
     {
-        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("GuidSessionDataRequest", out var values) && Guid.TryParse(values.FirstOrDefault(), out var guidSessionDataRequest))
+        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(GuidSessionDataRequest, out var values) && Guid.TryParse(values.FirstOrDefault(), out var guidSessionDataRequest))
         {
             return guidSessionDataRequest;
         }
@@ -65,7 +74,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
     {
-        if (request.Headers.TryGetValues("X-Refit-Client", out var values) && Enum.TryParse<EnumMicroservice>(values.FirstOrDefault(), out var enumValue))
+        if (request.Headers.TryGetValues(RefitClientHeader, out var values) && Enum.TryParse<EnumMicroservice>(values.FirstOrDefault(), out var enumValue))
         {
             return enumValue;
         }

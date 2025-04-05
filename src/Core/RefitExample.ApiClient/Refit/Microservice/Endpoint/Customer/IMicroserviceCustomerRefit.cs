@@ -1,7 +1,7 @@
 ﻿using Refit;
 using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
 
-namespace RefitExampe.ApiClient.Refit.Microservice.Endpoint.Customer;
+namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.Customer;
 
 public interface IMicroserviceCustomerRefit
 {

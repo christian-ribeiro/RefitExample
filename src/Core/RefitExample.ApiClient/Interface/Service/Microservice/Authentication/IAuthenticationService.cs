@@ -1,6 +1,6 @@
 ﻿using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
 
-namespace RefitExampe.ApiClient.Interface.Service.Microservice.Authentication;
+namespace RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
 
 public interface IAuthenticationService
 {

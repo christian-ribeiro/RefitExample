@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RefitExampe.ApiClient\RefitExampe.ApiClient.csproj" />
+    <ProjectReference Include="..\RefitExample.ApiClient\RefitExample.ApiClient.csproj" />
     <ProjectReference Include="..\RefitExample.Arguments\RefitExample.Arguments.csproj" />
     <ProjectReference Include="..\RefitExample.Domain\RefitExample.Domain.csproj" />
   </ItemGroup>

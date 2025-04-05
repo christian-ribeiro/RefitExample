@@ -1,4 +1,4 @@
-﻿namespace RefitExampe.ApiClient.Refit.Microservice.Handler;
+﻿namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
 public class MicroserviceAuthenticationHandler : DelegatingHandler
 {

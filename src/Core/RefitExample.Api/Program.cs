@@ -1,10 +1,10 @@
 using Refit;
-using RefitExampe.ApiClient.Interface.Service.Microservice.Authentication;
-using RefitExampe.ApiClient.Refit.Microservice.Endpoint.Authentication;
-using RefitExampe.ApiClient.Refit.Microservice.Endpoint.Customer;
-using RefitExampe.ApiClient.Refit.Microservice.Endpoint.User;
-using RefitExampe.ApiClient.Refit.Microservice.Handler;
-using RefitExampe.ApiClient.Service.Microservice.Authentication;
+using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.Customer;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.User;
+using RefitExample.ApiClient.Refit.Microservice.Handler;
+using RefitExample.ApiClient.Service.Microservice.Authentication;
 using RefitExample.Arguments.Enum.Microservice;
 using RefitExample.Domain.Interface.Service.User;
 using RefitExample.Domain.Service.User;
@@ -30,7 +30,7 @@ builder.Services.AddRefitClient<IMicroserviceUserRefit>()
     .ConfigureHttpClient((client) =>
     {
         client.BaseAddress = new Uri("https://reqres.in");
-        client.DefaultRequestHeaders.Add("X-Refit-Client", nameof(EnumMicroservice.DrugTrafficking));
+        client.DefaultRequestHeaders.Add(MicroserviceHandler.RefitClientHeader, nameof(EnumMicroservice.DrugTrafficking));
     })
     .AddHttpMessageHandler<MicroserviceHandler>();
 
@@ -38,7 +38,7 @@ builder.Services.AddRefitClient<IMicroserviceCustomerRefit>()
     .ConfigureHttpClient((client) =>
     {
         client.BaseAddress = new Uri("https://reqres.in");
-        client.DefaultRequestHeaders.Add("X-Refit-Client", nameof(EnumMicroservice.Pimp));
+        client.DefaultRequestHeaders.Add(MicroserviceHandler.RefitClientHeader, nameof(EnumMicroservice.Pimp));
     })
     .AddHttpMessageHandler<MicroserviceHandler>();
 

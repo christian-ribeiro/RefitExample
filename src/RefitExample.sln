@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.35906.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExampe.ApiClient", "Core\RefitExampe.ApiClient\RefitExampe.ApiClient.csproj", "{984BD198-3C79-4B08-B86C-FE2070109218}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.ApiClient", "Core\RefitExample.ApiClient\RefitExample.ApiClient.csproj", "{984BD198-3C79-4B08-B86C-FE2070109218}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Arguments", "Core\RefitExample.Arguments\RefitExample.Arguments.csproj", "{2F1B8EC9-BE7E-468A-A25B-27A164074CF0}"
 EndProject
