@@ -16,19 +16,13 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     private async Task<HttpResponseMessage> TrySendAsync(HttpRequestMessage request, CancellationToken cancellationToken, bool exit)
     {
-        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("GuidSessionDataRequest", out var values))
-        {
-            if (Guid.TryParse(values.FirstOrDefault(), out var guidSessionDataRequest))
-            {
-                Console.WriteLine($"GuidSessionDataRequest: {guidSessionDataRequest}");
-                request.Options.Set(new HttpRequestOptionsKey<Guid>("GuidSessionDataRequest"), guidSessionDataRequest);
-            }
-        }
+        var guidSessionDataRequest = GetGuidSessionDataRequest();
+        long loggedUserId = SessionData.GetLoggedUser(guidSessionDataRequest) ?? 0;
 
-        var authentication = SessionData.GetMicroserviceAuthentication(EnumMicroservice.DrugTrafficking, 1);
+        var authentication = SessionData.GetMicroserviceAuthentication(EnumMicroservice.DrugTrafficking, loggedUserId);
         if (authentication == null && !exit)
         {
-            Authenticate();
+            Authenticate(loggedUserId);
             return await TrySendAsync(request, cancellationToken, true);
         }
 
@@ -41,16 +35,29 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
         if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !exit)
         {
-            Authenticate();
+            Authenticate(loggedUserId);
             return await TrySendAsync(request, cancellationToken, true);
         }
 
         return response;
     }
 
-    private void Authenticate()
+    private void Authenticate(long loggedUserId)
     {
+        if (loggedUserId == 0)
+            return;
+
         var authenticate = authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        SessionData.AddMicroserviceAuthentication(new MicroserviceAuthentication(EnumMicroservice.DrugTrafficking, 1, authenticate.Result.Token));
+        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(EnumMicroservice.DrugTrafficking, loggedUserId, authenticate.Result.Token));
+    }
+
+    private Guid GetGuidSessionDataRequest()
+    {
+        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("GuidSessionDataRequest", out var values) && Guid.TryParse(values.FirstOrDefault(), out var guidSessionDataRequest))
+        {
+            return guidSessionDataRequest;
+        }
+
+        return Guid.Empty;
     }
 }

@@ -16,10 +16,25 @@ namespace RefitExample.Arguments.Argument.Session
             return sessionDataRequest.GuidSessionDataRequest;
         }
 
-        public static void AddMicroserviceAuthentication(MicroserviceAuthentication microserviceAuthentication) =>
-                ListMicroserviceAuthentication.Add(microserviceAuthentication);
+        public static void SetMicroserviceAuthentication(MicroserviceAuthentication microserviceAuthentication)
+        {
+            ListMicroserviceAuthentication.Add(microserviceAuthentication);
+        }
 
-        public static MicroserviceAuthentication? GetMicroserviceAuthentication(EnumMicroservice microservice, long enterpriseId) =>
-            ListMicroserviceAuthentication.Where(x => x.Microservice == microservice && x.EntepriseId == enterpriseId).FirstOrDefault();
+        public static void SetLoggedUser(Guid guidSessionDataRequest, long loggedUserId)
+        {
+            if (_listSessionDataRequest.TryGetValue(guidSessionDataRequest, out var sessionData))
+                sessionData.LoggerUserId = loggedUserId;
+        }
+
+        public static MicroserviceAuthentication? GetMicroserviceAuthentication(EnumMicroservice microservice, long enterpriseId)
+        {
+            return ListMicroserviceAuthentication.Where(x => x.Microservice == microservice && x.EntepriseId == enterpriseId).FirstOrDefault();
+        }
+
+        public static long? GetLoggedUser(Guid guidSessionDataRequest)
+        {
+            return _listSessionDataRequest.TryGetValue(guidSessionDataRequest, out var sessionData) ? sessionData.LoggerUserId : null;
+        }
     }
 }

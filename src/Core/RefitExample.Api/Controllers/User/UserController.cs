@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RefitExample.Arguments.Argument.Session;
 using RefitExample.Domain.Interface.Service.User;
 
 namespace RefitExample.Api.Controllers.User;
@@ -7,11 +8,12 @@ namespace RefitExample.Api.Controllers.User;
 [Route("/api/[controller]")]
 public class UserController(IUserService userService) : Controller
 {
-    private readonly Guid _guidSessionDataRequest = Guid.NewGuid();
-
     [HttpGet]
     public async Task<ActionResult> GetUsers(int page = 1)
     {
+        Guid _guidSessionDataRequest = SessionData.Initialize();
+        SessionData.SetLoggedUser(_guidSessionDataRequest, 1);
+
         Request.Headers.Append("GuidSessionDataRequest", _guidSessionDataRequest.ToString());
 
         var result = await userService.GetUsers(page);
