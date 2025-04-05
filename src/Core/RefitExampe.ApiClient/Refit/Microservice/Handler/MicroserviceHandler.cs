@@ -11,45 +11,46 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        return await TrySendAsync(request, cancellationToken, false);
+        return await SendWithAuthRetryAsync(request, false, cancellationToken);
     }
 
-    private async Task<HttpResponseMessage> TrySendAsync(HttpRequestMessage request, CancellationToken cancellationToken, bool exit)
+    private async Task<HttpResponseMessage> SendWithAuthRetryAsync(HttpRequestMessage request, bool isRetry, CancellationToken cancellationToken)
     {
         var guidSessionDataRequest = GetGuidSessionDataRequest();
         long loggedUserId = SessionData.GetLoggedUser(guidSessionDataRequest) ?? 0;
         EnumMicroservice microservice = GetMicroservice(request);
 
         var authentication = SessionData.GetMicroserviceAuthentication(microservice, loggedUserId);
-        if (authentication == null && !exit)
+        if (authentication == null && !isRetry)
         {
-            Authenticate(loggedUserId, microservice);
-            return await TrySendAsync(request, cancellationToken, true);
+            await Authenticate(loggedUserId, microservice);
+            return await SendWithAuthRetryAsync(request, true, cancellationToken);
         }
 
         if (authentication != null)
         {
+            request.Headers.Remove("Authorization");
             request.Headers.Add("Authorization", $"Bearer {authentication!.Token}");
         }
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !exit)
+        if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !isRetry)
         {
-            Authenticate(loggedUserId, microservice);
-            return await TrySendAsync(request, cancellationToken, true);
+            await Authenticate(loggedUserId, microservice);
+            return await SendWithAuthRetryAsync(request, true, cancellationToken);
         }
 
         return response;
     }
 
-    private void Authenticate(long loggedUserId, EnumMicroservice microservice)
+    private async Task Authenticate(long loggedUserId, EnumMicroservice microservice)
     {
         if (loggedUserId == 0)
             return;
 
-        var authenticate = authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedUserId, authenticate.Result.Token));
+        var authenticate = await authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
+        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedUserId, authenticate.Token));
     }
 
     private Guid GetGuidSessionDataRequest()
