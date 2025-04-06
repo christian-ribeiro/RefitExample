@@ -44,16 +44,14 @@ builder.Services.AddRefitClient<IMicroserviceCredentialRefit>(refitSettings)
     .AddHttpMessageHandler<MicroserviceAuthenticationHandler>();
 
 builder.Services.AppendRefitInterfaces<IMicroserviceRefitInterface>(
-    httpClientConfigurator: (client, type) =>
+    httpClientConfigurator: (client, type, _) =>
     {
         client.BaseAddress = MicroserviceEnvironmentVariable.BaseAddress;
 
         var microserviceRefitAttribute = type.GetCustomAttribute<MicroserviceRefitAttribute>();
 
         if (microserviceRefitAttribute != null)
-        {
             client.DefaultRequestHeaders.Add(MicroserviceHandler.RefitClientHeader, microserviceRefitAttribute.Microservice.ToString());
-        }
     },
     refitSettings: refitSettings,
     configureHttpClientBuilder: builder => builder.AddHttpMessageHandler<MicroserviceHandler>()
