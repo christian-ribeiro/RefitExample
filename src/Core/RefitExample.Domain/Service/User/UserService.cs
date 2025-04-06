@@ -6,8 +6,9 @@ namespace RefitExample.Domain.Service.User;
 
 public class UserService(IMicroserviceDrugTraffickingRefit microserviceDrugTraffickingRefit, IMicroservicePimpRefit microservicePimpRefit) : IUserService
 {
-    public async Task<string?> GetUsers()
+    public async Task<List<string>> GetUsers()
     {
+        var content = new List<string>();
         var response = await microserviceDrugTraffickingRefit.GetUsers();
         if (!response.IsSuccessStatusCode)
         {
@@ -20,6 +21,9 @@ public class UserService(IMicroserviceDrugTraffickingRefit microserviceDrugTraff
             // Tratar erros
         }
 
-        return response.Content;
+        content.Add(response.Content!);
+        content.Add(response2.Content!);
+
+        return content;
     }
 }

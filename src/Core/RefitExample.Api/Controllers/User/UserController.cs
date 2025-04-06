@@ -10,7 +10,7 @@ namespace RefitExample.Api.Controllers.User;
 public class UserController(IUserService userService) : Controller
 {
     [HttpGet]
-    public async Task<ActionResult<string>> GetUsers()
+    public async Task<ActionResult<List<string>>> GetUsers()
     {
         Guid _guidSessionDataRequest = SessionData.Initialize();
         SessionData.SetLoggedEnterprise(_guidSessionDataRequest, 1);

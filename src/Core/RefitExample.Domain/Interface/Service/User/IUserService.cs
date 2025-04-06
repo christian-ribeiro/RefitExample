@@ -2,5 +2,5 @@
 
 public interface IUserService
 {
-    Task<string?> GetUsers();
+    Task<List<string>> GetUsers();
 }

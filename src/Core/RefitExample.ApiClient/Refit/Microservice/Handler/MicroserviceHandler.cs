@@ -64,10 +64,10 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
             return;
 
         //Consumir Área Admin buscando as chaves
-        //Autenticar no Microservice, após isso salvar as informações necessárias no MicroserviceAuthentication
         var credential = await microserviceCredentialRefit.GetCredential(new InputCredential(loggedEntepriseId, microservice));
         if (credential.IsSuccessStatusCode && credential.Content != null)
         {
+            //Autenticar no Microservice, após isso salvar as informações necessárias no MicroserviceAuthentication
             var authenticate = await microserviceAuthenticationRefit.Login(new InputAuthenticate(credential.Content!.ApplicationId, credential.Content!.ContractId));
             if (authenticate.IsSuccessStatusCode && authenticate.Content != null)
                 MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Content.Token));
