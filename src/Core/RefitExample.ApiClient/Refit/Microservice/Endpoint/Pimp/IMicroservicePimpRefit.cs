@@ -9,5 +9,5 @@ namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.Pimp;
 public interface IMicroservicePimpRefit : IMicroserviceRefitInterface
 {
     [Get("/api/User/Pimp")]
-    Task<ApiResponse<string>> GetUsers();
+    Task<ApiResponse<string>> Pimp();
 }

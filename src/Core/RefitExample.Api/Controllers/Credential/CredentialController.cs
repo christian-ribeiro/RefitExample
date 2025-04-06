@@ -13,7 +13,6 @@ public class CredentialController : Controller
         new OutputCredential(1, EnumMicroservice.DrugTrafficking, Guid.NewGuid(), Guid.NewGuid()),
         new OutputCredential(1, EnumMicroservice.Pimp, Guid.NewGuid(), Guid.NewGuid()),
         new OutputCredential(2, EnumMicroservice.DrugTrafficking, Guid.NewGuid(), Guid.NewGuid()),
-        new OutputCredential(2, EnumMicroservice.Pimp, Guid.NewGuid(), Guid.NewGuid()),
     ];
 
     [HttpPost]

@@ -25,7 +25,7 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        if (!string.IsNullOrEmpty(token) && response.StatusCode == HttpStatusCode.Unauthorized)
         {
             await Authenticate(loggedEnterpriseId, microservice);
 

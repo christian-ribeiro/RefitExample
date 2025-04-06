@@ -9,11 +9,11 @@ namespace RefitExample.Api.Controllers.User;
 [Route("/api/[controller]")]
 public class UserController(IUserService userService) : Controller
 {
-    [HttpGet]
-    public async Task<ActionResult<List<string>>> GetUsers()
+    [HttpGet("{enterpriseId}")]
+    public async Task<ActionResult<List<string>>> GetUsers(long enterpriseId)
     {
         Guid _guidSessionDataRequest = SessionData.Initialize();
-        SessionData.SetLoggedEnterprise(_guidSessionDataRequest, 1);
+        SessionData.SetLoggedEnterprise(_guidSessionDataRequest, enterpriseId);
 
         Request.Headers.Append(MicroserviceHandler.GuidSessionDataRequest, _guidSessionDataRequest.ToString());
 
@@ -21,13 +21,13 @@ public class UserController(IUserService userService) : Controller
         return Ok(result);
     }
 
-    [HttpGet("Drug")]
+    [HttpGet("DrugTrafficking")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<string> Drug()
+    public ActionResult<string> DrugTrafficking()
     {
         if (string.IsNullOrEmpty(Request.Headers.Authorization.ToString()))
             return Unauthorized();
-        return Ok("Drug");
+        return Ok("DrugTrafficking");
     }
 
     [HttpGet("Pimp")]

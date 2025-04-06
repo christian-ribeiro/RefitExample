@@ -8,6 +8,6 @@ namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.DrugTrafficking;
 [MicroserviceRefit(EnumMicroservice.DrugTrafficking)]
 public interface IMicroserviceDrugTraffickingRefit : IMicroserviceRefitInterface
 {
-    [Get("/api/User/Drug")]
-    Task<ApiResponse<string>> GetUsers();
+    [Get("/api/User/DrugTrafficking")]
+    Task<ApiResponse<string>> DrugTrafficking();
 }

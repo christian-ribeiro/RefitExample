@@ -6,7 +6,7 @@ namespace RefitExample.ApiClient.Refit.Extensions;
 
 public static class RefitServiceCollectionExtensions
 {
-    public static IServiceCollection AppendRefitInterfaces<TTypeInterface>(this IServiceCollection services, Action<HttpClient, Type, IServiceProvider> httpClientConfigurator, RefitSettings? refitSettings, Func<IHttpClientBuilder, IHttpClientBuilder>? configureHttpClientBuilder = null)
+    public static IServiceCollection AppendRefitInterfaces<TTypeInterface>(this IServiceCollection services, Action<HttpClient, Type, IServiceProvider> httpClientConfigurator, RefitSettings? refitSettings = null, Func<IHttpClientBuilder, IHttpClientBuilder>? configureHttpClientBuilder = null)
         where TTypeInterface : IBaseRefitInterface
     {
         var types = GetListInterfaceType(typeof(TTypeInterface));
