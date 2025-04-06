@@ -16,10 +16,8 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var guidSessionDataRequest = GetGuidSessionDataRequest();
-        long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
+        long loggedEnterpriseId = GetLoggedEnterprise();
         var microservice = GetMicroservice(request);
-
         var token = await GetOrAuthenticateTokenAsync(loggedEnterpriseId, microservice);
         UpdateAuthorizationHeader(request, token);
 
@@ -73,6 +71,14 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
     {
         var header = httpContextAccessor.HttpContext.Request.Headers[GuidSessionDataRequest].FirstOrDefault();
         return Guid.TryParse(header, out var guid) ? guid : Guid.Empty;
+    }
+
+    private long GetLoggedEnterprise()
+    {
+        var guidSessionDataRequest = GetGuidSessionDataRequest();
+        long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
+
+        return loggedEnterpriseId;
     }
 
     private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
