@@ -25,7 +25,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
         long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
         EnumMicroservice microservice = GetMicroservice(request);
 
-        var authentication = SessionData.GetMicroserviceAuthentication(microservice, loggedEnterpriseId);
+        var authentication = MicroserviceAuthCache.TryGetValidAuth(loggedEnterpriseId, microservice);
         if (authentication == null && !isRetry)
         {
             await Authenticate(loggedEnterpriseId, microservice);
@@ -59,7 +59,7 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
             return;
 
         var authenticate = await authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        SessionData.SetMicroserviceAuthentication(new MicroserviceAuthentication(microservice, loggedEntepriseId, authenticate.Token));
+        MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Token));
     }
 
     private Guid GetGuidSessionDataRequest()
