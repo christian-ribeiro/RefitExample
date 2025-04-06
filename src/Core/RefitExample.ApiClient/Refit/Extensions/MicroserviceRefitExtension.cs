@@ -23,6 +23,12 @@ public static class RefitServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AppendRefitInterfaces<TTypeInterface>(this IServiceCollection services, Action<HttpClient> httpClientConfigurator, Func<IHttpClientBuilder, IHttpClientBuilder>? configureHttpClientBuilder = null)
+        where TTypeInterface : IBaseRefitInterface
+    {
+        return services.AppendRefitInterfaces<TTypeInterface>((client, _) => httpClientConfigurator(client), configureHttpClientBuilder);
+    }
+
     private static IEnumerable<Type> GetListInterfaceType(Type baseInterface)
     {
         return typeof(IBaseRefitInterface).Assembly.GetTypes()
