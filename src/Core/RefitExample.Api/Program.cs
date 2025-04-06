@@ -1,6 +1,7 @@
 using Refit;
 using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
 using RefitExample.ApiClient.Refit.Extensions;
+using RefitExample.ApiClient.Refit.Microservice.Configuration;
 using RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
 using RefitExample.ApiClient.Refit.Microservice.Handler;
 using RefitExample.ApiClient.Refit.Microservice.Interface;
@@ -23,10 +24,10 @@ builder.Services.AddTransient<MicroserviceHandler>();
 builder.Services.AddTransient<MicroserviceAuthenticationHandler>();
 
 builder.Services.AddRefitClient<IMicroserviceAuthenticationRefit>()
-    .ConfigureHttpClient(client => client.BaseAddress = new Uri("https://reqres.in"))
+    .ConfigureHttpClient(client => client.BaseAddress = MicroserviceEnvironmentVariable.BaseAddress)
     .AddHttpMessageHandler<MicroserviceAuthenticationHandler>();
 
-builder.Services.AppendRefitInterfaces<IMicroserviceRefitInterface>(builder => builder.AddHttpMessageHandler<MicroserviceHandler>());
+builder.Services.AppendRefitInterfaces<IMicroserviceRefitInterface>(() => MicroserviceEnvironmentVariable.BaseAddress, builder => builder.AddHttpMessageHandler<MicroserviceHandler>());
 #endregion
 
 var app = builder.Build();

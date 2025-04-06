@@ -11,9 +11,7 @@ public static class MicroserviceRefitExtension
     private static IEnumerable<Type> GetListInterfaceType(Type interfaceType) => (from i in typeof(IBaseRefitInterface).Assembly.GetTypes()
                                                                                   where interfaceType.IsAssignableFrom(i) && i != interfaceType && i.IsInterface
                                                                                   select i);
-
-
-    public static IServiceCollection AppendRefitInterfaces<TTypeInterface>(this IServiceCollection services, Func<IHttpClientBuilder, IHttpClientBuilder>? configureHttpClientBuilder = null)
+    public static IServiceCollection AppendRefitInterfaces<TTypeInterface>(this IServiceCollection services, Func<Uri> baseAddressProvider, Func<IHttpClientBuilder, IHttpClientBuilder>? configureHttpClientBuilder = null)
         where TTypeInterface : IBaseRefitInterface
     {
         var types = GetListInterfaceType(typeof(TTypeInterface));
@@ -24,7 +22,7 @@ public static class MicroserviceRefitExtension
         {
             var httpClientBuilder = services.AddRefitClient(item).ConfigureHttpClient((client) =>
             {
-                client.BaseAddress = new Uri("https://reqres.in");
+                client.BaseAddress = baseAddressProvider();
                 client.DefaultRequestHeaders.Add(MicroserviceHandler.RefitClientHeader, Regex.Match(item.Name, pattern).Groups[1].Value);
             });
 
