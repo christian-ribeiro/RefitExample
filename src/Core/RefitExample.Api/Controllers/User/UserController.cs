@@ -27,6 +27,7 @@ public class UserController(IUserService userService) : Controller
     {
         if (string.IsNullOrEmpty(Request.Headers.Authorization.ToString()))
             return Unauthorized();
+
         return Ok("DrugTrafficking");
     }
 
