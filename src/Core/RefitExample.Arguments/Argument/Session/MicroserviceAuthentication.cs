@@ -1,6 +1,4 @@
-﻿using RefitExample.Arguments.Enum.Microservice;
-
-namespace RefitExample.Arguments.Argument.Session;
+﻿namespace RefitExample.Arguments.Argument.Session;
 
 public class MicroserviceAuthentication(string token)
 {
