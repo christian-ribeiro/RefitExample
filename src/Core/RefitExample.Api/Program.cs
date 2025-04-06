@@ -1,13 +1,11 @@
 using Refit;
 using RefitExample.ApiClient.DataAnnotation;
-using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
 using RefitExample.ApiClient.Refit.Extensions;
 using RefitExample.ApiClient.Refit.Microservice.Configuration;
 using RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
 using RefitExample.ApiClient.Refit.Microservice.Endpoint.Credential;
 using RefitExample.ApiClient.Refit.Microservice.Handler;
 using RefitExample.ApiClient.Refit.Microservice.Interface;
-using RefitExample.ApiClient.Service.Microservice.Authentication;
 using RefitExample.Domain.Interface.Service.User;
 using RefitExample.Domain.Service.User;
 using System.Reflection;
@@ -20,7 +18,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 #region Refit

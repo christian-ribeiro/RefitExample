@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
 using RefitExample.ApiClient.Refit.Microservice.Endpoint.Credential;
 using RefitExample.Arguments.Argument.Authenticate;
 using RefitExample.Arguments.Argument.Credential;
@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 
 namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
-public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
+public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IMicroserviceAuthenticationRefit microserviceAuthenticationRefit, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
     public const string AuthorizationHeader = "Authorization";
     public const string GuidSessionDataRequest = "GuidSessionDataRequest";
@@ -68,8 +68,9 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
         var credential = await microserviceCredentialRefit.GetCredential(new InputCredential(loggedEntepriseId, microservice));
         if (credential.IsSuccessStatusCode && credential.Content != null)
         {
-            var authenticate = await authenticationService.Login(new InputAuthenticate(credential.Content!.ApplicationId, credential.Content!.ContractId));
-            MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Token));
+            var authenticate = await microserviceAuthenticationRefit.Login(new InputAuthenticate(credential.Content!.ApplicationId, credential.Content!.ContractId));
+            if (authenticate.IsSuccessStatusCode && authenticate.Content != null)
+                MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Content.Token));
         }
     }
 
