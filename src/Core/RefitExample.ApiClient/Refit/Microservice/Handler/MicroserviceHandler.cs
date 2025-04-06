@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
-using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
+using RefitExample.ApiClient.Refit.Microservice.Endpoint.Credential;
+using RefitExample.Arguments.Argument.Authenticate;
+using RefitExample.Arguments.Argument.Credential;
 using RefitExample.Arguments.Argument.Session;
 using RefitExample.Arguments.Enum.Microservice;
 using System.Net;
@@ -8,7 +10,7 @@ using System.Net.Http.Headers;
 
 namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
-public class MicroserviceHandler(IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
+public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IAuthenticationService authenticationService, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
     public const string AuthorizationHeader = "Authorization";
     public const string GuidSessionDataRequest = "GuidSessionDataRequest";
@@ -63,8 +65,12 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
         //Consumir Área Admin buscando as chaves
         //Autenticar no Microservice, após isso salvar as informações necessárias no MicroserviceAuthentication
-        var authenticate = await authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
-        MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Token));
+        var credential = await microserviceCredentialRefit.GetCredential(new InputCredential(loggedEntepriseId, microservice));
+        if (credential.IsSuccessStatusCode && credential.Content != null)
+        {
+            var authenticate = await authenticationService.Login(new InputAuthenticate(credential.Content!.ApplicationId, credential.Content!.ContractId));
+            MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Token));
+        }
     }
 
     private Guid GetGuidSessionDataRequest()

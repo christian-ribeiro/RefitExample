@@ -1,11 +1,10 @@
 ﻿using Refit;
-using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
+using RefitExample.Arguments.Argument.Authenticate;
 
-namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication
+namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
+
+public interface IMicroserviceAuthenticationRefit
 {
-    public interface IMicroserviceAuthenticationRefit
-    {
-        [Post("/api/login")]
-        Task<ApiResponse<OutputAuthResponse>> Login([Body] InputAuthenticateUser inputUserAuthentication);
-    }
+    [Post("/api/Authenticate")]
+    Task<ApiResponse<OutputAuthenticate>> Login([Body] InputAuthenticate inputAuthenticate);
 }

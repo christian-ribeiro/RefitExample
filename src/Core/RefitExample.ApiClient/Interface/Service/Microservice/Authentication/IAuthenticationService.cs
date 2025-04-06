@@ -1,8 +1,8 @@
-﻿using RefitExample.Arguments.Argument.Refit.Microservice.Endpoint.Authentication;
+﻿using RefitExample.Arguments.Argument.Authenticate;
 
 namespace RefitExample.ApiClient.Interface.Service.Microservice.Authentication;
 
 public interface IAuthenticationService
 {
-    Task<OutputAuthResponse> Login(InputAuthenticateUser inputAuthenticateUser);
+    Task<OutputAuthenticate> Login(InputAuthenticate inputAuthenticateUser);
 }
