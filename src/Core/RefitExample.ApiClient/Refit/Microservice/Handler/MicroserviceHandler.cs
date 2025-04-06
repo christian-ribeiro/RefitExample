@@ -16,33 +16,38 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        return await SendWithAuthRetryAsync(request, false, cancellationToken);
-    }
-
-    private async Task<HttpResponseMessage> SendWithAuthRetryAsync(HttpRequestMessage request, bool isRetry, CancellationToken cancellationToken)
-    {
         var guidSessionDataRequest = GetGuidSessionDataRequest();
         long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
-        EnumMicroservice microservice = GetMicroservice(request);
+        var microservice = GetMicroservice(request);
 
-        var authentication = MicroserviceAuthCache.TryGetValidAuth(loggedEnterpriseId, microservice);
-        if (authentication == null && !isRetry)
-        {
-            await Authenticate(loggedEnterpriseId, microservice);
-            return await SendWithAuthRetryAsync(request, true, cancellationToken);
-        }
-
-        UpdateAuthorizationHeader(request, authentication?.Token);
+        var token = await GetOrAuthenticateTokenAsync(loggedEnterpriseId, microservice);
+        UpdateAuthorizationHeader(request, token);
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        if (!response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.Unauthorized && !isRetry)
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             await Authenticate(loggedEnterpriseId, microservice);
-            return await SendWithAuthRetryAsync(request, true, cancellationToken);
+
+            var retryToken = MicroserviceAuthCache.TryGetValidAuth(loggedEnterpriseId, microservice)?.Token;
+            if (!string.IsNullOrEmpty(retryToken))
+            {
+                UpdateAuthorizationHeader(request, retryToken);
+                return await base.SendAsync(request, cancellationToken);
+            }
         }
 
         return response;
+    }
+
+    private async Task<string?> GetOrAuthenticateTokenAsync(long enterpriseId, EnumMicroservice microservice)
+    {
+        var auth = MicroserviceAuthCache.TryGetValidAuth(enterpriseId, microservice);
+        if (auth != null)
+            return auth.Token;
+
+        await Authenticate(enterpriseId, microservice);
+        return MicroserviceAuthCache.TryGetValidAuth(enterpriseId, microservice)?.Token;
     }
 
     private static void UpdateAuthorizationHeader(HttpRequestMessage request, string? token)
@@ -64,21 +69,16 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
 
     private Guid GetGuidSessionDataRequest()
     {
-        if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue(GuidSessionDataRequest, out var values) && Guid.TryParse(values.FirstOrDefault(), out var guidSessionDataRequest))
-        {
-            return guidSessionDataRequest;
-        }
-
-        return Guid.Empty;
+        var header = httpContextAccessor.HttpContext.Request.Headers[GuidSessionDataRequest].FirstOrDefault();
+        return Guid.TryParse(header, out var guid) ? guid : Guid.Empty;
     }
 
     private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
     {
-        if (request.Headers.TryGetValues(RefitClientHeader, out var values) && Enum.TryParse<EnumMicroservice>(values.FirstOrDefault(), out var enumValue))
-        {
-            return enumValue;
-        }
+        var header = request.Headers.Contains(RefitClientHeader)
+            ? request.Headers.GetValues(RefitClientHeader).FirstOrDefault()
+            : null;
 
-        return EnumMicroservice.None;
+        return Enum.TryParse(header, out EnumMicroservice microservice) ? microservice : EnumMicroservice.None;
     }
 }
