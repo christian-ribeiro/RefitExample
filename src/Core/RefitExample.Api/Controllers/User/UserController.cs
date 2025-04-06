@@ -9,6 +9,11 @@ namespace RefitExample.Api.Controllers.User;
 [Route("/api/[controller]")]
 public class UserController(IUserService userService) : Controller
 {
+    /// <summary>
+    /// Endpoint da API principal que consumirá os Microservices
+    /// </summary>
+    /// <param name="enterpriseId"></param>
+    /// <returns></returns>
     [HttpGet("{enterpriseId}")]
     public async Task<ActionResult<List<string>>> GetUsers(long enterpriseId)
     {
@@ -20,25 +25,4 @@ public class UserController(IUserService userService) : Controller
         var result = await userService.GetUsers();
         return Ok(result);
     }
-
-    [HttpGet("DrugTrafficking")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<string> DrugTrafficking()
-    {
-        if (string.IsNullOrEmpty(Request.Headers.Authorization.ToString()))
-            return Unauthorized();
-
-        return Ok("DrugTrafficking");
-    }
-
-    [HttpGet("Pimp")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<string> Pimp()
-    {
-        if (string.IsNullOrEmpty(Request.Headers.Authorization.ToString()))
-            return Unauthorized();
-
-        return Ok("Pimp");
-    }
-
 }

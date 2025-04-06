@@ -8,6 +8,9 @@ namespace RefitExample.Api.Controllers.Credential;
 [Route("/api/[controller]")]
 public class CredentialController : Controller
 {
+    /// <summary>
+    /// Dados estáticos simulando registros cadastrados para as empresas
+    /// </summary>
     public static readonly List<OutputCredential> _credentialList =
     [
         new OutputCredential(1, EnumMicroservice.DrugTrafficking, Guid.NewGuid(), Guid.NewGuid()),
@@ -16,6 +19,11 @@ public class CredentialController : Controller
         new OutputCredential(3, EnumMicroservice.Pimp, Guid.NewGuid(), Guid.NewGuid()),
     ];
 
+    /// <summary>
+    /// Endpoint simulando a Área Admin, onde receberá o id da empresa e retornará as credenciais para serem enviadas para o Microservice
+    /// </summary>
+    /// <param name="credential"></param>
+    /// <returns></returns>
     [HttpPost]
     [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult<OutputCredential> GetCredential([FromBody] InputCredential credential)

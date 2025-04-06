@@ -8,6 +8,6 @@ namespace RefitExample.ApiClient.Refit.Microservice.Endpoint.Pimp;
 [MicroserviceRefit(EnumMicroservice.Pimp)]
 public interface IMicroservicePimpRefit : IMicroserviceRefitInterface
 {
-    [Get("/api/User/Pimp")]
+    [Get("/api/Pimp")]
     Task<ApiResponse<string>> Pimp();
 }

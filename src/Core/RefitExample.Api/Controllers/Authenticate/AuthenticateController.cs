@@ -8,6 +8,11 @@ namespace RefitExample.Api.Controllers.Authenticate;
 [Route("/api/[controller]")]
 public class AuthenticateController : Controller
 {
+    /// <summary>
+    /// Endpoint simulando o Microservice, onde receberá as chaves e devolverá o Token
+    /// </summary>
+    /// <param name="inputAuthenticate"></param>
+    /// <returns></returns>
     [HttpPost]
     [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult<OutputAuthenticate> Authenticate(InputAuthenticate inputAuthenticate)
