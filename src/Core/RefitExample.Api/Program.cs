@@ -44,9 +44,7 @@ builder.Services.AppendRefitInterfaces<IMicroserviceRefitInterface>(
     {
         client.BaseAddress = MicroserviceEnvironmentVariable.BaseAddress;
 
-        var microserviceRefitAttribute = type.GetCustomAttribute<MicroserviceRefitAttribute>() ?? type.GetInterfaces()
-               .Select(i => i.GetCustomAttribute<MicroserviceRefitAttribute>())
-               .FirstOrDefault(attr => attr != null);
+        var microserviceRefitAttribute = type.GetCustomAttribute<MicroserviceRefitAttribute>();
 
         if (microserviceRefitAttribute != null)
         {
