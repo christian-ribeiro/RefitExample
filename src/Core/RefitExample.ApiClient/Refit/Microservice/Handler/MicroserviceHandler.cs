@@ -63,6 +63,8 @@ public class MicroserviceHandler(IAuthenticationService authenticationService, I
         if (loggedEntepriseId == 0)
             return;
 
+        //Consumir Área Admin buscando as chaves
+        //Autenticar no Microservice, após isso salvar as informações necessárias no MicroserviceAuthentication
         var authenticate = await authenticationService.Login(new InputAuthenticateUser("eve.holt@reqres.in", "cityslicka"));
         MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Token));
     }
