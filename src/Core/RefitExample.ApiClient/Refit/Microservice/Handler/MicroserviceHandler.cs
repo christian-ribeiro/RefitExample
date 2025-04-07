@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RefitExample.ApiClient.Refit.Microservice.Endpoint.Authentication;
-using RefitExample.ApiClient.Refit.Microservice.Endpoint.Credential;
+using RefitExample.ApiClient.Refit.Microservice.MockEndpoint.Authentication;
+using RefitExample.ApiClient.Refit.Microservice.MockEndpoint.Credential;
 using RefitExample.Arguments.Argument.Authenticate;
 using RefitExample.Arguments.Argument.Credential;
 using RefitExample.Arguments.Argument.Session;
