@@ -3,7 +3,7 @@
 namespace RefitExample.Api.Controllers.Pimp;
 
 [ApiController]
-[Route("/api/[controller]")]
+[Route("gateway/Pimp/api/[controller]")]
 public class PimpController : Controller
 {
     /// <summary>

@@ -2,5 +2,5 @@
 
 public class MicroserviceEnvironmentVariable
 {
-    public static Uri BaseAddress => new Uri("https://localhost:7266/");
+    public static Uri BaseAddress => new Uri("https://localhost:7266");
 }

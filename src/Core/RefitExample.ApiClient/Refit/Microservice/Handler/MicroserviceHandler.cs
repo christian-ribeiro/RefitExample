@@ -23,6 +23,8 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
         var token = await GetOrAuthenticateTokenAsync(loggedEnterpriseId, microservice);
         UpdateAuthorizationHeader(request, token);
 
+        request.RequestUri = RewriteUri(request.RequestUri!, microservice);
+
         var response = await base.SendAsync(request, cancellationToken);
 
         if (!string.IsNullOrEmpty(token) && response.StatusCode == HttpStatusCode.Unauthorized)
@@ -95,5 +97,26 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
             : null;
 
         return Enum.TryParse(header, out EnumMicroservice microservice) ? microservice : EnumMicroservice.None;
+    }
+
+    private static Uri RewriteUri(Uri originalUri, EnumMicroservice microservice)
+    {
+        var scheme = originalUri.Scheme;
+        var host = originalUri.Host;
+        var port = originalUri.Port;
+        var originalPath = originalUri.AbsolutePath;
+
+        var newPath = $"/gateway/{microservice}{originalPath}";
+
+        var newUriBuilder = new UriBuilder
+        {
+            Scheme = scheme,
+            Host = host,
+            Port = port,
+            Path = newPath,
+            Query = originalUri.Query
+        };
+
+        return newUriBuilder.Uri;
     }
 }

@@ -3,7 +3,7 @@
 namespace RefitExample.Api.Controllers.DrugTrafficking;
 
 [ApiController]
-[Route("/api/[controller]")]
+[Route("gateway/DrugTrafficking/api/[controller]")]
 public class DrugTraffickingController : Controller
 {
     /// <summary>
