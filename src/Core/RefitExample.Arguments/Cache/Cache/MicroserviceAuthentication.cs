@@ -1,4 +1,4 @@
-﻿namespace RefitExample.Arguments.Argument.Session;
+﻿namespace RefitExample.Arguments.Cache.Cache;
 
 public class MicroserviceAuthentication(string token)
 {

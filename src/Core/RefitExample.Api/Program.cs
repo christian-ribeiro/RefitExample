@@ -6,6 +6,8 @@ using RefitExample.ApiClient.Refit.Microservice.Handler;
 using RefitExample.ApiClient.Refit.Microservice.Interface;
 using RefitExample.ApiClient.Refit.MockEndpoint.Authentication;
 using RefitExample.ApiClient.Refit.MockEndpoint.Credential;
+using RefitExample.Arguments.Cache.Cache;
+using RefitExample.Arguments.Cache.Interface;
 using RefitExample.Arguments.Const;
 using RefitExample.Arguments.Extension;
 using RefitExample.Domain.Interface.Service.User;
@@ -20,6 +22,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<IMicroserviceAuthCache, MicroserviceAuthCache>();
 
 #region Refit
 //Tratativa para garantir que nenhum Refit que herde de IMicroserviceRefitInterface esteja sem o DataAnnotation

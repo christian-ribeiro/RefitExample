@@ -3,7 +3,8 @@ using RefitExample.ApiClient.Refit.MockEndpoint.Authentication;
 using RefitExample.ApiClient.Refit.MockEndpoint.Credential;
 using RefitExample.Arguments.Argument.Authenticate;
 using RefitExample.Arguments.Argument.Credential;
-using RefitExample.Arguments.Argument.Session;
+using RefitExample.Arguments.Cache.Cache;
+using RefitExample.Arguments.Cache.Interface;
 using RefitExample.Arguments.Const;
 using RefitExample.Arguments.Enum.Microservice;
 using RefitExample.Arguments.Extension;
@@ -11,26 +12,26 @@ using System.Net;
 
 namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
-public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IMicroserviceAuthenticationRefit microserviceAuthenticationRefit, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
+public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IMicroserviceAuthenticationRefit microserviceAuthenticationRefit, IMicroserviceAuthCache microserviceAuthCache, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        long loggedEnterpriseId = httpContextAccessor.HttpContext.GetLoggedEnterprise();
+        long enterpriseId = httpContextAccessor.HttpContext.GetLoggedEnterprise();
         var microservice = GetMicroservice(request);
-        var token = await GetOrAuthenticateTokenAsync(loggedEnterpriseId, microservice);
-        
+        var token = await GetOrAuthenticateTokenAsync(enterpriseId, microservice);
+
         request.SetBearerToken(token);
 
         request.RequestUri = RewriteUri(request.RequestUri!, microservice);
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        if (!string.IsNullOrEmpty(token) && response.StatusCode == HttpStatusCode.Unauthorized)
+        // Se a resposta indicar que o token atual não tem mais permissão, tenta reautenticar e reenviar a requisição.
+        if (!string.IsNullOrWhiteSpace(token) && response.StatusCode.In(HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden))
         {
-            await Authenticate(loggedEnterpriseId, microservice);
+            var retryToken = await TryAuthenticate(enterpriseId, microservice);
 
-            var retryToken = MicroserviceAuthCache.TryGetValidAuth(loggedEnterpriseId, microservice)?.Token;
-            if (!string.IsNullOrEmpty(retryToken))
+            if (!string.IsNullOrWhiteSpace(retryToken))
             {
                 request.SetBearerToken(retryToken);
                 return await base.SendAsync(request, cancellationToken);
@@ -42,28 +43,26 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
 
     private async Task<string?> GetOrAuthenticateTokenAsync(long enterpriseId, EnumMicroservice microservice)
     {
-        var auth = MicroserviceAuthCache.TryGetValidAuth(enterpriseId, microservice);
+        var auth = microserviceAuthCache.TryGetValidAuth(enterpriseId, microservice);
         if (auth != null)
             return auth.Token;
 
-        await Authenticate(enterpriseId, microservice);
-        return MicroserviceAuthCache.TryGetValidAuth(enterpriseId, microservice)?.Token;
+        return await TryAuthenticate(enterpriseId, microservice);
     }
 
-    private async Task Authenticate(long loggedEntepriseId, EnumMicroservice microservice)
+    private async Task<string?> TryAuthenticate(long enterpriseId, EnumMicroservice microservice)
     {
-        if (loggedEntepriseId == 0)
-            return;
+        var credentialResponse = await microserviceCredentialRefit.GetCredential(new InputCredential(enterpriseId, microservice));
+        if (!credentialResponse.IsSuccessStatusCode || credentialResponse.Content == null)
+            return null;
 
-        //Consumir Área Admin buscando as chaves
-        var credential = await microserviceCredentialRefit.GetCredential(new InputCredential(loggedEntepriseId, microservice));
-        if (credential.IsSuccessStatusCode && credential.Content != null)
-        {
-            //Autenticar no Microservice, após isso salvar as informações necessárias no MicroserviceAuthentication
-            var authenticate = await microserviceAuthenticationRefit.Login(new InputAuthenticate(credential.Content!.ApplicationId, credential.Content!.ContractId));
-            if (authenticate.IsSuccessStatusCode && authenticate.Content != null)
-                MicroserviceAuthCache.AddOrUpdateAuth(loggedEntepriseId, microservice, new MicroserviceAuthentication(authenticate.Content.Token));
-        }
+        var authResponse = await microserviceAuthenticationRefit.Login(new InputAuthenticate(credentialResponse.Content.ApplicationId, credentialResponse.Content.ContractId));
+        if (!authResponse.IsSuccessStatusCode || authResponse.Content == null)
+            return null;
+
+        var token = authResponse.Content.Token;
+        microserviceAuthCache.AddOrUpdateAuth(enterpriseId, microservice, new MicroserviceAuthentication(token));
+        return token;
     }
 
     private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
