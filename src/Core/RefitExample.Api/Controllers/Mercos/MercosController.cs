@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace RefitExample.Api.Controllers.Pimp;
+namespace RefitExample.Api.Controllers.Mercos;
 
 [ApiController]
-[Route("gateway/Pimp/api/[controller]")]
-public class PimpController : Controller
+[Route("gateway/Mercos/api/[controller]")]
+public class MercosController : Controller
 {
     /// <summary>
-    /// Endpoint consumido pelo Microservice Pimp
+    /// Endpoint consumido pelo Microservice Mercos
     /// </summary>
     /// <returns></returns>
     [HttpGet]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<string> Pimp()
+    public ActionResult<string> Mercos()
     {
         if (string.IsNullOrEmpty(Request.Headers.Authorization.ToString()))
             return Unauthorized();
 
-        return Ok("Pimp");
+        return Ok("Mercos");
     }
 }

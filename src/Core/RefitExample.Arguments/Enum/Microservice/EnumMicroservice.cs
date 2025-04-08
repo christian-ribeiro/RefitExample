@@ -3,6 +3,6 @@
 public enum EnumMicroservice
 {
     None = 0,
-    DrugTrafficking = 1,
-    Pimp = 2,
+    ACBr = 1,
+    Mercos = 2,
 }
