@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 namespace RefitExample.Arguments.Argument.Session;
 
 using EnterpriseId = Int64;
+
 public static class MicroserviceAuthCache
 {
     private static readonly ConcurrentDictionary<EnterpriseId, ConcurrentDictionary<EnumMicroservice, MicroserviceAuthentication>> _cache = new();

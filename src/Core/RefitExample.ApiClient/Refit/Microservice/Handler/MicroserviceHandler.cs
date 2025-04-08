@@ -1,27 +1,25 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RefitExample.ApiClient.Refit.Microservice.MockEndpoint.Authentication;
-using RefitExample.ApiClient.Refit.Microservice.MockEndpoint.Credential;
+using RefitExample.ApiClient.Refit.MockEndpoint.Authentication;
+using RefitExample.ApiClient.Refit.MockEndpoint.Credential;
 using RefitExample.Arguments.Argument.Authenticate;
 using RefitExample.Arguments.Argument.Credential;
 using RefitExample.Arguments.Argument.Session;
+using RefitExample.Arguments.Const;
 using RefitExample.Arguments.Enum.Microservice;
+using RefitExample.Arguments.Extension;
 using System.Net;
-using System.Net.Http.Headers;
 
 namespace RefitExample.ApiClient.Refit.Microservice.Handler;
 
 public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCredentialRefit, IMicroserviceAuthenticationRefit microserviceAuthenticationRefit, IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {
-    public const string AuthorizationHeader = "Authorization";
-    public const string GuidSessionDataRequest = "GuidSessionDataRequest";
-    public const string RefitClientHeader = "X-Refit-Client";
-
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        long loggedEnterpriseId = GetLoggedEnterprise();
+        long loggedEnterpriseId = httpContextAccessor.HttpContext.GetLoggedEnterprise();
         var microservice = GetMicroservice(request);
         var token = await GetOrAuthenticateTokenAsync(loggedEnterpriseId, microservice);
-        UpdateAuthorizationHeader(request, token);
+        
+        request.SetBearerToken(token);
 
         request.RequestUri = RewriteUri(request.RequestUri!, microservice);
 
@@ -34,7 +32,7 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
             var retryToken = MicroserviceAuthCache.TryGetValidAuth(loggedEnterpriseId, microservice)?.Token;
             if (!string.IsNullOrEmpty(retryToken))
             {
-                UpdateAuthorizationHeader(request, retryToken);
+                request.SetBearerToken(retryToken);
                 return await base.SendAsync(request, cancellationToken);
             }
         }
@@ -50,14 +48,6 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
 
         await Authenticate(enterpriseId, microservice);
         return MicroserviceAuthCache.TryGetValidAuth(enterpriseId, microservice)?.Token;
-    }
-
-    private static void UpdateAuthorizationHeader(HttpRequestMessage request, string? token)
-    {
-        if (!string.IsNullOrEmpty(token))
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
     }
 
     private async Task Authenticate(long loggedEntepriseId, EnumMicroservice microservice)
@@ -76,27 +66,9 @@ public class MicroserviceHandler(IMicroserviceCredentialRefit microserviceCreden
         }
     }
 
-    private Guid GetGuidSessionDataRequest()
-    {
-        var header = httpContextAccessor.HttpContext.Request.Headers[GuidSessionDataRequest].FirstOrDefault();
-        return Guid.TryParse(header, out var guid) ? guid : Guid.Empty;
-    }
-
-    private long GetLoggedEnterprise()
-    {
-        var guidSessionDataRequest = GetGuidSessionDataRequest();
-        long loggedEnterpriseId = SessionData.GetLoggedEnterprise(guidSessionDataRequest) ?? 0;
-
-        return loggedEnterpriseId;
-    }
-
     private static EnumMicroservice GetMicroservice(HttpRequestMessage request)
     {
-        var header = request.Headers.Contains(RefitClientHeader)
-            ? request.Headers.GetValues(RefitClientHeader).FirstOrDefault()
-            : null;
-
-        return Enum.TryParse(header, out EnumMicroservice microservice) ? microservice : EnumMicroservice.None;
+        return request.GetHeaderValue<EnumMicroservice>(ConfigurationConst.RefitClientHeader, Enum.TryParse);
     }
 
     private static Uri RewriteUri(Uri originalUri, EnumMicroservice microservice)

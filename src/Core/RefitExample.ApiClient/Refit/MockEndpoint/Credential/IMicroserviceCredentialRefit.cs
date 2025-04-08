@@ -1,7 +1,7 @@
 ﻿using Refit;
 using RefitExample.Arguments.Argument.Credential;
 
-namespace RefitExample.ApiClient.Refit.Microservice.MockEndpoint.Credential;
+namespace RefitExample.ApiClient.Refit.MockEndpoint.Credential;
 
 public interface IMicroserviceCredentialRefit
 {

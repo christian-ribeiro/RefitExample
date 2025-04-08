@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RefitExample.ApiClient.Refit.Microservice.Handler;
 using RefitExample.Arguments.Argument.Session;
+using RefitExample.Arguments.Const;
 using RefitExample.Domain.Interface.Service.User;
 
 namespace RefitExample.Api.Controllers.User;
@@ -20,7 +20,7 @@ public class UserController(IUserService userService) : Controller
         Guid _guidSessionDataRequest = SessionData.Initialize();
         SessionData.SetLoggedEnterprise(_guidSessionDataRequest, enterpriseId);
 
-        Request.Headers.Append(MicroserviceHandler.GuidSessionDataRequest, _guidSessionDataRequest.ToString());
+        Request.Headers.Append(ConfigurationConst.GuidSessionDataRequest, _guidSessionDataRequest.ToString());
 
         var result = await userService.GetUsers();
         return Ok(result);
