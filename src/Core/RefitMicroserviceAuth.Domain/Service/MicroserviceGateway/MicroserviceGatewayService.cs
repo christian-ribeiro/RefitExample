@@ -1,16 +1,16 @@
 ﻿using RefitMicroserviceAuth.ApiClient.Refit.Microservice.Endpoint.ACBr;
 using RefitMicroserviceAuth.ApiClient.Refit.Microservice.Endpoint.Mercos;
-using RefitMicroserviceAuth.Domain.Interface.Service.User;
+using RefitMicroserviceAuth.Domain.Interface.Service.MicroserviceGateway;
 
-namespace RefitMicroserviceAuth.Domain.Service.User;
+namespace RefitMicroserviceAuth.Domain.Service.MicroserviceGateway;
 
-public class UserService(IMicroserviceACBrRefit microserviceACBrRefit, IMicroserviceMercosRefit microserviceMercosRefit) : IUserService
+public class MicroserviceGatewayService(IMicroserviceACBrRefit microserviceACBrRefit, IMicroserviceMercosRefit microserviceMercosRefit) : IMicroserviceGatewayService
 {
     /// <summary>
     /// Exemplo de um Service que irá consumir um Microservice
     /// </summary>
     /// <returns></returns>
-    public async Task<List<string>> GetUsers()
+    public async Task<List<string>> ConsumeService()
     {
         var content = new List<string>();
         var response = await microserviceACBrRefit.ACBr();

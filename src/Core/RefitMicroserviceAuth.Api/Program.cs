@@ -10,8 +10,8 @@ using RefitMicroserviceAuth.Arguments.Cache.Cache;
 using RefitMicroserviceAuth.Arguments.Cache.Interface;
 using RefitMicroserviceAuth.Arguments.Const;
 using RefitMicroserviceAuth.Arguments.Extension;
-using RefitMicroserviceAuth.Domain.Interface.Service.User;
-using RefitMicroserviceAuth.Domain.Service.User;
+using RefitMicroserviceAuth.Domain.Interface.Service.MicroserviceGateway;
+using RefitMicroserviceAuth.Domain.Service.MicroserviceGateway;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMicroserviceGatewayService, MicroserviceGatewayService>();
 builder.Services.AddSingleton<IMicroserviceAuthCache, MicroserviceAuthCache>();
 
 #region Refit
