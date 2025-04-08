@@ -14,10 +14,10 @@ Demonstrar, de forma prática, como estruturar um sistema baseado em microservic
 ## 📦 Principais Projetos e Responsabilidades
 ```
 RefitMicroserviceAuth/
-├── RefitMicroserviceAuth.Api/               # API principal com endpoints mockados
-│   └── Controllers/                         # Controladores por microserviço
+├── RefitMicroserviceAuth.Api/              # API principal com endpoints mockados
+│   └── Controllers/                        # Controladores por microserviço
 ├── RefitMicroserviceAuth.ApiClient/        # Configuração e consumo via Refit
-│   └── Refit/                               # Interfaces, handlers e extensions Refit
+│   └── Refit/                              # Interfaces, handlers e extensions Refit
 ├── RefitMicroserviceAuth.Arguments/        # DTOs, Enums, Cache e Constantes
 ├── RefitMicroserviceAuth.Domain/           # Serviços de domínio e interfaces
 ```
